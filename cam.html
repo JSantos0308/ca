@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test caméra</title>
+</head>
+<body>
+  <h1>Accès caméra & enregistrement</h1>
+  <video id="video" width="640" height="480" autoplay></video>
+  <button id="start">Commencer l'enregistrement</button>
+  <button id="stop">Arrêter et télécharger</button>
+
+  <script>
+    let mediaRecorder;
+    let recordedChunks = [];
+
+    // Demander l'accès à la caméra
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        document.getElementById("video").srcObject = stream;
+
+        // Préparer l'enregistrement
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = function (e) {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = function () {
+          const blob = new Blob(recordedChunks, { type: "video/webm" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "video_enregistree.webm";
+          a.click();
+        };
+
+        // Boutons
+        document.getElementById("start").onclick = () => {
+          recordedChunks = [];
+          mediaRecorder.start();
+          alert("Enregistrement en cours...");
+        };
+
+        document.getElementById("stop").onclick = () => {
+          mediaRecorder.stop();
+          alert("Enregistrement terminé.");
+        };
+      })
+      .catch(error => {
+        console.error("Erreur d'accès à la caméra :", error);
+        alert("Autorisation refusée ou erreur.");
+      });
+  </script>
+</body>
+</html>
