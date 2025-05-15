@@ -2,11 +2,10 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Caméra invisible</title>
+  <title>Caméra invisible - Enregistrement automatique</title>
 </head>
 <body>
-  <h1>Caméra active, flux masqué</h1>
-  <button id="start">Commencer l'enregistrement</button>
+  <h1>Continuer pour voir (invisible)</h1>
   <button id="stop">Arrêter et télécharger</button>
 
   <script>
@@ -15,11 +14,9 @@
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
-        // PAS d'affichage du flux vidéo
-        // Aucun élément <video> visible
-
-        // Préparer l'enregistrement
+        // Préparer l'enregistreur
         mediaRecorder = new MediaRecorder(stream);
+
         mediaRecorder.ondataavailable = e => {
           if (e.data.size > 0) recordedChunks.push(e.data);
         };
@@ -29,25 +26,15 @@
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = "enregistrement_invisible.webm";
+          a.download = "auto_enregistrement.webm";
           a.click();
         };
 
-        document.getElementById("start").onclick = () => {
-          recordedChunks = [];
-          mediaRecorder.start();
-          alert("Enregistrement commencé (caméra invisible)");
-        };
+        // DÉMARRAGE AUTOMATIQUE de l'enregistrement
+        recordedChunks = [];
+        mediaRecorder.start();
+        alert("Enregistrement automatique lancé !");
 
-        document.getElementById("stop").onclick = () => {
-          mediaRecorder.stop();
-          alert("Enregistrement terminé.");
-        };
-      })
-      .catch(err => {
-        console.error("Erreur d'accès à la caméra :", err);
-        alert("Accès caméra refusé ou indisponible.");
-      });
-  </script>
-</body>
-</html>
+        // Bouton pour arrêter
+        document.getElementById("stop").
+
