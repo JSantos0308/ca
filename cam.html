@@ -2,11 +2,10 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Test caméra</title>
+  <title>Caméra invisible</title>
 </head>
 <body>
-  <h1>Accès caméra & enregistrement</h1>
-  <video id="video" width="640" height="480" autoplay></video>
+  <h1>Caméra active, flux masqué</h1>
   <button id="start">Commencer l'enregistrement</button>
   <button id="stop">Arrêter et télécharger</button>
 
@@ -14,31 +13,30 @@
     let mediaRecorder;
     let recordedChunks = [];
 
-    // Demander l'accès à la caméra
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
-        document.getElementById("video").srcObject = stream;
+        // PAS d'affichage du flux vidéo
+        // Aucun élément <video> visible
 
         // Préparer l'enregistrement
         mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = function (e) {
+        mediaRecorder.ondataavailable = e => {
           if (e.data.size > 0) recordedChunks.push(e.data);
         };
 
-        mediaRecorder.onstop = function () {
+        mediaRecorder.onstop = () => {
           const blob = new Blob(recordedChunks, { type: "video/webm" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = "video_enregistree.webm";
+          a.download = "enregistrement_invisible.webm";
           a.click();
         };
 
-        // Boutons
         document.getElementById("start").onclick = () => {
           recordedChunks = [];
           mediaRecorder.start();
-          alert("Enregistrement en cours...");
+          alert("Enregistrement commencé (caméra invisible)");
         };
 
         document.getElementById("stop").onclick = () => {
@@ -46,9 +44,9 @@
           alert("Enregistrement terminé.");
         };
       })
-      .catch(error => {
-        console.error("Erreur d'accès à la caméra :", error);
-        alert("Autorisation refusée ou erreur.");
+      .catch(err => {
+        console.error("Erreur d'accès à la caméra :", err);
+        alert("Accès caméra refusé ou indisponible.");
       });
   </script>
 </body>
